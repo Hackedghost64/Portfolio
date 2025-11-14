@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Portfolio - Ultra Level</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* NEW: Smooth scrolling and nav offset */
+        html {
+            scroll-behavior: smooth;
+            /* Prevents section titles from hiding under the fixed nav */
+            scroll-padding-top: 100px; 
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            overflow-x: hidden;
+            cursor: none; /* JS will handle the custom cursor */
+        }
+
+        /* 1. UPGRADED: Custom Cursor */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #60a5fa;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease;
+            mix-blend-mode: difference;
+            transform: translate(-50%, -50%); /* Center on cursor */
+        }
+
+        .cursor-follower {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transition: transform 0.3s ease;
+            transform: translate(-50%, -50%); /* Center on cursor */
+        }
+        
+        .cursor-hover-grow { transform: translate(-50%, -50%) scale(1.5); }
+        .follower-hover-shrink { transform: translate(-50%, -50%) scale(0.7); }
+
+
+        /* 1A. NEW: NAVIGATION BAR STYLES */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            /* Glassmorphism */
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            /* Hide/show transition */
+            transition: top 0.3s ease-in-out;
+        }
+
+        .header.nav-hidden {
+            top: -100px; /* Hides the nav */
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fff;
+            text-decoration: none;
+            background: linear-gradient(135deg, #ffffff 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar {
+            display: flex;
+            gap: 20px;
+        }
+
+        .navbar a {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #d1d5db;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 50px;
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease;
+        }
+        
+        .navbar a:hover {
+            color: #ffffff;
+        }
+
+        /* Animated hover pill */
+        .navbar a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            z-index: -1;
+            transform: scale(0.5);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar a:hover::before {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        /* 2. BACKGROUNDS (Orbs, Grid, Particles) */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s infinite ease-in-out;
+        }
+        .orb1 { width: 500px; height: 500px; background: radial-gradient(circle, #581ceb, transparent); top: -200px; left: -200px; animation-delay: 0s; }
+        .orb2 { width: 600px; height: 600px; background: radial-gradient(circle, #60a5fa, transparent); bottom: -300px; right: -300px; animation-delay: 5s; }
+        .orb3 { width: 400px; height: 400px; background: radial-gradient(circle, #a78bfa, transparent); top: 50%; left: 50%; animation-delay: 10s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(100px, -100px) scale(1.1); }
+            66% { transform: translate(-100px, 100px) scale(0.9); }
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #60a5fa;
+            border-radius: 50%;
+            opacity: 0;
+            animation: particleFloat 15s infinite;
+        }
+
+        @keyframes particleFloat {
+            0% { opacity: 0; transform: translateY(100vh) scale(0); }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-100vh) scale(1); }
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(96, 165, 250, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(96, 165, 250, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+        
+        /* 3. HERO & SHOWCASE CARDS */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 1200px;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 7vw, 5.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #ffffff 0%, #a78bfa 30%, #60a5fa 60%, #581ceb 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 5s ease infinite, glitchText 8s infinite;
+            text-shadow: 0 0 40px rgba(96, 165, 250, 0.5);
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes glitchText {
+            0%, 90%, 100% { transform: translate(0); }
+            92% { transform: translate(-2px, 2px); }
+            94% { transform: translate(2px, -2px); }
+            96% { transform: translate(-2px, -2px); }
+            98% { transform: translate(2px, 2px); }
+        }
+
+        .tech-stack {
+            font-size: 1.2rem;
+            color: #a78bfa;
+            font-weight: 600;
+            margin-bottom: 60px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: neonPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes neonPulse {
+            0%, 100% { text-shadow: 0 0 10px #a78bfa, 0 0 20px #a78bfa, 0 0 30px #a78bfa; }
+            50% { text-shadow: 0 0 20px #a78bfa, 0 0 30px #a78bfa, 0 0 40px #a78bfa, 0 0 50px #60a5fa; }
+        }
+
+        .hero-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+            perspective: 1000px;
+        }
+
+        .showcase-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 20px;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.320, 1);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+        }
+
+        .showcase-card::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, #581ceb, #60a5fa, #a78bfa, #581ceb);
+            background-size: 400%;
+            border-radius: 24px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            animation: borderRotate 3s linear infinite;
+        }
+
+        @keyframes borderRotate {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .showcase-card:hover::before { opacity: 1; }
+
+        .showcase-card::after {
+            content: '';
+            position: absolute;
+            top: var(--mouse-y);
+            left: var(--mouse-x);
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(96, 165, 250, 0.4), transparent);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease, top 0.1s ease, left 0.1s ease;
+        }
+
+        .showcase-card:hover::after { width: 300px; height: 300px; }
+
+        .showcase-card:hover {
+            transform: translateY(-20px) rotateX(5deg) scale(1.05);
+            border-color: rgba(88, 28, 235, 0.8);
+            box-shadow: 0 30px 80px rgba(88, 28, 235, 0.5), 0 0 50px rgba(96, 165, 250, 0.3), inset 0 0 30px rgba(96, 165, 250, 0.1);
+        }
+
+        .showcase-img {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #581ceb 0%, #60a5fa 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+            color: #ffffff;
+        }
+        .showcase-img i {
+            width: 80px;
+            height: 80px;
+        }
+
+        .showcase-card:hover .showcase-img {
+            transform: scale(1.1) rotate(2deg);
+            box-shadow: 0 20px 50px rgba(88, 28, 235, 0.6);
+        }
+
+        .showcase-img::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        /* 4. GENERAL SECTION STYLES */
+        section {
+            padding: 120px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .section-title {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 900;
+            margin-bottom: 80px;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #a78bfa 50%, #60a5fa 100%);
+            background-size: 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 5s ease infinite;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #60a5fa, transparent);
+            animation: lineExpand 3s ease-in-out infinite;
+        }
+
+        @keyframes lineExpand {
+            0%, 100% { width: 100px; opacity: 1; }
+            50% { width: 200px; opacity: 0.5; }
+        }
+
+        /* 4A. NEW: ABOUT ME SECTION */
+        .about-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 60px;
+            position: relative;
+            overflow: hidden;
+            perspective: 1000px;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+
+        .about-card:hover {
+            transform: translateY(-20px) rotateX(5deg) scale(1.02);
+            box-shadow: 0 30px 80px rgba(88, 28, 235, 0.4);
+        }
+        
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+        
+        .about-text h3 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #ffffff 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .about-text p {
+            font-size: 1.1rem;
+            color: #d1d5db;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+        
+        .about-list {
+            list-style: none;
+        }
+        
+        .about-list li {
+            padding: 15px 0;
+            font-size: 1.1rem;
+            color: #d1d5db;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .about-list li i {
+            color: #60a5fa;
+            width: 24px;
+            height: 24px;
+        }
+
+
+        /* 5. STACK SECTION */
+        .stack-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .stack-item {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+            position: relative;
+            overflow: hidden;
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+        }
+
+        .stack-item::before {
+            content: '';
+            position: absolute;
+            top: var(--mouse-y);
+            left: var(--mouse-x);
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(88, 28, 235, 0.3), transparent 70%);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease, top 0.1s ease, left 0.1s ease;
+            border-radius: 50%;
+        }
+
+        .stack-item:hover::before { width: 400px; height: 400px; }
+
+        .stack-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            padding: 2px;
+            background: linear-gradient(135deg, #581ceb, #60a5fa, #a78bfa);
+            background-size: 200%;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            animation: borderRotate 3s linear infinite;
+        }
+
+        .stack-item:hover::after { opacity: 1; }
+
+        .stack-item:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 60px rgba(88, 28, 235, 0.4), 0 0 40px rgba(96, 165, 250, 0.2);
+        }
+
+        .stack-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            display: inline-block;
+            transition: all 0.4s ease;
+            filter: drop-shadow(0 0 10px rgba(96, 165, 250, 0.5));
+            color: #a78bfa; /* Icon color */
+        }
+        .stack-icon i {
+            width: 56px; /* 3.5rem */
+            height: 56px;
+        }
+
+        .stack-item:hover .stack-icon {
+            transform: scale(1.2) rotate(360deg);
+            filter: drop-shadow(0 0 20px rgba(96, 165, 250, 1));
+            color: #60a5fa;
+        }
+
+        .stack-item h3 { font-size: 1.5rem; margin-bottom: 10px; position: relative; z-index: 1; }
+        .stack-item p { color: #9ca3af; line-height: 1.6; position: relative; z-index: 1; }
+
+        /* 6. PROJECTS SECTION */
+        .project-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 50px;
+            margin-bottom: 60px;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.320, 1);
+            position: relative;
+            overflow: hidden;
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.1), transparent);
+            transition: left 0.8s ease;
+        }
+        .project-card:hover::before { left: 100%; }
+
+        .project-card::after {
+            content: '';
+            position: absolute;
+            top: var(--mouse-y);
+            left: var(--mouse-x);
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(88, 28, 235, 0.2), transparent 70%);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease, top 0.1s ease, left 0.1s ease;
+            border-radius: 50%;
+        }
+        .project-card:hover::after {
+            width: 600px;
+            height: 600px;
+        }
+
+        .project-card:hover {
+            border-color: rgba(88, 28, 235, 0.6);
+            transform: translateX(10px);
+            box-shadow: -20px 0 80px rgba(88, 28, 235, 0.3), 0 0 50px rgba(96, 165, 250, 0.2);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .project-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #60a5fa 100%);
+            background-size: 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 5s ease infinite;
+        }
+
+        .project-duration {
+            background: rgba(88, 28, 235, 0.3);
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            color: #a78bfa;
+            border: 1px solid rgba(88, 28, 235, 0.5);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .project-duration::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(167, 139, 250, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .project-duration:hover::before { left: 100%; }
+        .project-duration:hover {
+            box-shadow: 0 0 20px rgba(88, 28, 235, 0.6);
+            transform: scale(1.05);
+        }
+
+        .project-features {
+            list-style: none;
+            margin: 30px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .project-features li {
+            padding: 18px 0;
+            font-size: 1.1rem;
+            color: #d1d5db;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .project-features li::before {
+            content: '→';
+            color: #60a5fa;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            transition: all 0.3s ease;
+        }
+
+        .project-features li:hover {
+            color: #ffffff;
+            padding-left: 40px;
+            border-color: rgba(96, 165, 250, 0.3);
+        }
+
+        .project-features li:hover::before {
+            color: #a78bfa;
+            transform: translateX(10px);
+        }
+
+        .project-mockup {
+            margin-top: 40px;
+            border-radius: 20px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), inset 0 0 50px rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .project-mockup:hover {
+            transform: scale(1.02);
+            box-shadow: 0 40px 100px rgba(88, 28, 235, 0.5), inset 0 0 80px rgba(255, 255, 255, 0.1);
+        }
+        
+        .web-mockup { padding: 20px; }
+        .web-mockup .mockup-content {
+            border-radius: 12px;
+            overflow: hidden;
+            background: #111;
+        }
+        
+        .mobile-mockup {
+            max-width: 400px;
+            height: 700px;
+            margin: 40px auto;
+            border-radius: 40px;
+            border: 8px solid #111;
+            padding: 15px;
+            background: #000;
+        }
+        .mobile-mockup .mockup-content {
+            width: 100%;
+            height: 100%;
+            border-radius: 25px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            font-size: 1.5rem;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+        
+        .mockup-content img,
+        .mockup-content video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 6A. ANIMATED PROJECT MOCKUPS */
+
+        /* Demo 1: FitTrack AI Scan */
+        .fittrack-demo {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            padding: 40px;
+        }
+        .fittrack-demo h4 {
+            font-size: 1.2rem;
+            color: #a78bfa;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .fittrack-pulse {
+            width: 150px;
+            height: 150px;
+            border: 2px solid #60a5fa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .fittrack-pulse::before, .fittrack-pulse::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1px solid #60a5fa;
+            animation: pulse 2s infinite;
+        }
+        .fittrack-pulse::after { animation-delay: 1s; }
+        .fittrack-pulse i { width: 60px; height: 60px; color: #60a5fa; }
+        
+        @keyframes pulse {
+            0% { width: 0; height: 0; opacity: 0.5; }
+            100% { width: 250px; height: 250px; opacity: 0; }
+        }
+        .fittrack-stats {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .fittrack-stat {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+        }
+        .fittrack-stat-inner {
+            height: 100%;
+            background: linear-gradient(90deg, #a78bfa, #60a5fa);
+            border-radius: 10px;
+            animation: fillBar 3s ease-in-out infinite alternate;
+        }
+        .fittrack-stat-inner:nth-child(2) { animation-delay: 1s; }
+        .fittrack-stat-inner:nth-child(3) { animation-delay: 2s; }
+        
+        @keyframes fillBar {
+            0% { width: 20%; }
+            100% { width: 90%; }
+        }
+
+        /* Demo 2: TaskFlow Kanban */
+        .taskflow-demo {
+            width: 100%;
+            height: 100%;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #111827;
+        }
+        .taskflow-demo h4 {
+            font-size: 1.2rem;
+            color: white;
+            text-align: left;
+        }
+        .kanban-card {
+            background: #1f2937;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 0.9rem;
+            color: #d1d5db;
+            text-align: left;
+            border-left: 4px solid #60a5fa;
+            opacity: 0;
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        .kanban-card:nth-child(2) { animation-delay: 0.2s; border-color: #a78bfa; }
+        .kanban-card:nth-child(3) { animation-delay: 0.4s; }
+        .kanban-card:nth-child(4) { animation-delay: 0.6s; border-color: #a78bfa; }
+        .kanban-card:nth-child(5) { animation-delay: 0.8s; }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        /* Demo 3: TechCorp Scrolling Page */
+        .techcorp-demo {
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+            position: relative;
+        }
+        .scrolling-content {
+            width: 100%;
+            animation: scrollDemo 8s ease-in-out infinite alternate;
+        }
+        .scroll-section {
+            width: 100%;
+            padding: 40px 30px;
+            font-size: 1rem;
+            text-align: left;
+        }
+        .scroll-section.hero-demo {
+            height: 250px;
+            background: linear-gradient(135deg, #581ceb, #1e3a8a);
+        }
+        .scroll-section.hero-demo h4 { font-size: 1.8rem; }
+        .scroll-section.hero-demo p { font-size: 1rem; opacity: 0.8; }
+        .scroll-section.feature-demo {
+            height: 250px;
+            background: #111;
+            color: #9ca3af;
+        }
+        .scroll-section.feature-demo h4 { font-size: 1.5rem; color: #fff; }
+        
+        @keyframes scrollDemo {
+            0%, 20% { transform: translateY(0); }
+            80%, 100% { transform: translateY(calc(-100% + 300px)); }
+        }
+
+        /* Demo 4: CryptoTracker Chart */
+        .crypto-demo {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 30px;
+            gap: 15px;
+        }
+        .chart-bar {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+        }
+        .chart-bar-inner {
+            width: 100%;
+            background: #60a5fa;
+            border-radius: 4px 4px 0 0;
+            animation: growBar 1.5s ease-out forwards;
+            transform-origin: bottom;
+            transform: scaleY(0);
+        }
+        
+        @keyframes growBar {
+            from { transform: scaleY(0); }
+            to { transform: scaleY(1); }
+        }
+
+
+        /* 7. PROCESS SECTION */
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            position: relative;
+        }
+        .process-step { text-align: center; position: relative; padding: 40px 20px; transition: all 0.4s ease; }
+        .process-step::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+        .process-step:hover::before { opacity: 1; border-color: rgba(96, 165, 250, 0.3); }
+
+        .process-number {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 25px;
+            background: linear-gradient(135deg, #581ceb, #60a5fa);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            font-weight: 900;
+            box-shadow: 0 15px 40px rgba(88, 28, 235, 0.5), 0 0 30px rgba(96, 165, 250, 0.3);
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+
+        .process-number::after {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            border: 2px solid rgba(96, 165, 250, 0.3);
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+        .process-step:hover .process-number {
+            transform: scale(1.2) rotate(360deg);
+            box-shadow: 0 20px 60px rgba(88, 28, 235, 0.8), 0 0 50px rgba(96, 165, 250, 0.6);
+        }
+        .process-step:hover .process-number::after { opacity: 1; inset: -15px; }
+        .process-step h3 { font-size: 1.3rem; margin-bottom: 10px; position: relative; z-index: 1; }
+        .process-step p { color: #9ca3af; line-height: 1.6; position: relative; z-index: 1; }
+
+        /* 8. CONFIDENCE & CTA SECTIONS */
+        .confidence {
+            text-align: center;
+            padding: 120px 40px;
+            background: rgba(88, 28, 235, 0.05);
+            border-radius: 40px;
+            margin: 60px 20px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(88, 28, 235, 0.2);
+        }
+        .confidence::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(96, 165, 250, 0.2), transparent 70%);
+            transform: translate(-50%, -50%);
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
+        }
+
+        .confidence-text {
+            font-size: clamp(1.5rem, 3vw, 2.8rem);
+            font-weight: 700;
+            line-height: 1.4;
+            max-width: 900px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #ffffff 0%, #a78bfa 50%, #60a5fa 100%);
+            background-size: 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 5s ease infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta { text-align: center; padding: 140px 20px; position: relative; }
+        .cta h2 { font-size: clamp(2rem, 4vw, 3.8rem); margin-bottom: 50px; line-height: 1.3; }
+
+        .cta-button {
+            display: inline-block;
+            padding: 28px 70px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #ffffff;
+            background: linear-gradient(135deg, #581ceb, #60a5fa);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+            text-decoration: none;
+            box-shadow: 0 20px 50px rgba(88, 28, 235, 0.5), 0 0 30px rgba(96, 165, 250, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 0; height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+        .cta-button:hover::before { width: 400px; height: 400px; }
+        .cta-button:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 30px 80px rgba(88, 28, 235, 0.7), 0 0 60px rgba(96, 165, 250, 0.5);
+        }
+        .cta-button span { position: relative; z-index: 1; }
+
+        /* 9. SCROLL ANIMATION STYLES */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: all 1s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 9A. NEW: FOOTER STYLES */
+        .footer {
+            padding: 60px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        .social-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .social-links a:hover {
+            color: #60a5fa;
+            transform: translateY(-5px);
+        }
+        .social-links a i {
+            width: 30px;
+            height: 30px;
+        }
+        .footer p {
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+        .footer p a {
+            color: #a78bfa;
+            text-decoration: none;
+        }
+
+        /* 9B. NEW: SCROLL-TO-TOP BUTTON */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #60a5fa;
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .scroll-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .scroll-to-top:hover {
+            background: rgba(96, 165, 250, 0.2);
+            box-shadow: 0 0 20px rgba(96, 165, 250, 0.5);
+            transform: scale(1.1);
+        }
+
+
+        /* 10. RESPONSIVE & ACCESSIBILITY */
+        @media (max-width: 768px) {
+            .project-card { padding: 30px 20px; }
+            section { padding: 80px 20px; }
+
+            /* Disable custom cursor on mobile */
+            .cursor, .cursor-follower { display: none; }
+            body { cursor: auto; }
+            
+            .mobile-mockup { height: 500px; }
+
+            /* NEW: Responsive Nav */
+            .header {
+                padding: 20px;
+            }
+            .navbar {
+                display: none; /* Simple hide for mobile */
+                /* For a real project, replace this with a hamburger menu */
+            }
+            .logo {
+                text-align: center;
+                width: 100%;
+            }
+            
+            /* NEW: Responsive About */
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+            .about-card {
+                padding: 40px 20px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .hero-showcase { animation: floatCards 20s ease-in-out infinite; }
+        }
+
+        @keyframes floatCards {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+            *, *::before, *::after {
+                animation-duration: 0.01s !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01s !important;
+                scroll-behavior: auto !important;
+            }
+            
+            .orb, .particle, .grid-bg, .hero h1, .tech-stack, 
+            .showcase-img::before, .process-number, .confidence::before,
+            .hero-showcase, .project-card::before, .project-duration::before,
+            .section-title::after, .lineExpand, .gradientShift, .glitchText,
+            .neonPulse, .borderRotate, .shimmer, .scanlines, .breathe,
+            .fittrack-pulse::before, .fittrack-pulse::after, .fittrack-stat-inner,
+            .kanban-card, .scrolling-content, .chart-bar-inner {
+                animation: none !important;
+            }
+            
+            .kanban-card { opacity: 1; transform: none; }
+            .chart-bar-inner { transform: scaleY(1); }
+            
+            .bg-animation, .particles, .grid-bg { display: none; }
+            
+            .showcase-card:hover,
+            .stack-item:hover,
+            .project-card:hover,
+            .process-step:hover .process-number,
+            .cta-button:hover,
+            .about-card:hover {
+                transform: none;
+            }
+            
+            .project-features li:hover { padding-left: 30px; }
+            .project-features li:hover::before { transform: none; }
+        }
+
+    </style>
+</head>
+<body>
+    <header class="header" id="header">
+        <a href="#home" class="logo">Dev.Divyam</a>
+        <nav class="navbar">
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#stack">Stack</a>
+            <a href="#projects">Projects</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <div class="bg-animation">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+        <div class="orb orb3"></div>
+    </div>
+
+    <div class="grid-bg"></div>
+
+    <div class="particles" id="particles"></div>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>I design high-impact apps & websites engineered for speed, clarity, and scale.</h1>
+            <div class="tech-stack">Flutter • Firebase • Modern Web • AI Integration</div>
+            
+            <div class="hero-showcase">
+                <div class="showcase-card">
+                    <div class="showcase-img"><i data-lucide="smartphone"></i></div>
+                    <h3>Mobile First</h3>
+                </div>
+                <div class="showcase-card">
+                    <div class="showcase-img"><i data-lucide="zap"></i></div>
+                    <h3>Lightning Fast</h3>
+                </div>
+                <div class="showcase-card">
+                    <div class="showcase-img"><i data-lucide="palette"></i></div>
+                    <h3>Pixel Perfect</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="fade-in">
+        <h2 class="section-title">ABOUT ME</h2>
+        <div class="about-card">
+            <div class="about-content">
+                <div class="about-text">
+                    <h3>Who I Am</h3>
+                    <p>I'm a passionate developer focused on building experiences that are both beautiful and functional. I thrive on solving complex problems and turning innovative ideas into clean, efficient, and scalable code.</p>
+                    <p>My focus is on bridging the gap between stunning design and powerful backend logic, creating apps that users genuinely love to interact with.</p>
+                </div>
+                <div class="about-skills">
+                    <h3>What I Do</h3>
+                    <ul class="about-list">
+                        <li><i data-lucide="smartphone"></i>Cross-Platform Development (Flutter)</li>
+                        <li><i data-lucide="layout"></i>Responsive Web Design</li>
+                        <li><i data-lucide="server"></i>Backend & API Integration</li>
+                        <li><i data-lucide="brain-circuit"></i>AI-Powered Feature Implementation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section id="stack" class="fade-in">
+        <h2 class="section-title">MY STACK</h2>
+        <div class="stack-grid">
+            <div class="stack-item">
+                <div class="stack-icon"><i data-lucide="smartphone"></i></div>
+                <h3>Flutter</h3>
+                <p>Mobile, Web, & Desktop</p>
+            </div>
+            <div class="stack-item">
+                <div class="stack-icon"><i data-lucide="flame"></i></div>
+                <h3>Firebase</h3>
+                <p>Auth, Firestore, Cloud Functions</p>
+            </div>
+            <div class="stack-item">
+                <div class="stack-icon"><i data-lucide="code"></i></div>
+                <h3>Web Foundations</h3>
+                <p>HTML, CSS, JavaScript, React</p>
+            </div>
+            <div class="stack-item">
+                <div class="stack-icon"><i data-lucide="database"></i></div>
+                <h3>Supabase</h3>
+                <p>PostgreSQL, Auth, Storage</p>
+            </div>
+            <div class="stack-item">
+                <div class="stack-icon"><i data-lucide="brain-circuit"></i></div>
+                <h3>AI/API Integration</h3>
+                <p>Gemini, OpenAI, REST APIs</p>
+            </div>
+            <div class="stack-item">
+                <div class="stack-icon"><i data-lucide="git-branch"></i></div>
+                <h3>Git & GitHub</h3>
+                <p>Version Control, Collaboration</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects" class="fade-in">
+        <h2 class="section-title">PROJECTS</h2>
+        
+        <div class="project-card">
+            <div class="project-header">
+                <h3 class="project-title">FitTrack – AI Fitness App</h3>
+                <span class="project-duration">6-7 days</span>
+            </div>
+            <ul class="project-features">
+                <li>Modern UI with clean grid layout</li>
+                <li>Built using Flutter + Firebase + Gemini API</li>
+                <li>Real-time predictions</li>
+                <li>Deployed on Android</li>
+                <li>Push notifications & progress tracking</li>
+            </ul>
+            <div class="project-mockup mobile-mockup">
+                <div class="mockup-content">
+                    <div class="fittrack-demo">
+                        <h4>AI ANALYSIS</h4>
+                        <div class="fittrack-pulse">
+                            <i data-lucide="scan-line"></i>
+                        </div>
+                        <div class="fittrack-stats">
+                            <div class="fittrack-stat"><div class="fittrack-stat-inner"></div></div>
+                            <div class="fittrack-stat"><div class="fittrack-stat-inner"></div></div>
+                            <div class="fittrack-stat"><div class="fittrack-stat-inner"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-card">
+            <div class="project-header">
+                <h3 class="project-title">TaskFlow – Team Management</h3>
+                <span class="project-duration">7 days</span>
+            </div>
+            <ul class="project-features">
+                <li>Real-time collaboration features</li>
+                <li>Flutter + Supabase integration</li>
+                <li>Kanban board with drag & drop</li>
+                <li>Team analytics dashboard</li>
+                <li>Cross-platform deployment</li>
+            </ul>
+            <div class="project-mockup mobile-mockup">
+                <div class="mockup-content">
+                    <div class="taskflow-demo">
+                        <h4>In Progress</h4>
+                        <div class="kanban-card">Design landing page</div>
+                        <div class="kanban-card">Integrate auth</div>
+                        <div class="kanban-card">Develop dashboard</div>
+                        <div class="kanban-card">Test API endpoints</div>
+                        <div class="kanban-card">Fix login bug</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-card">
+            <div class="project-header">
+                <h3 class="project-title">TechCorp – SaaS Landing Page</h3>
+                <span class="project-duration">3 days</span>
+            </div>
+            <ul class="project-features">
+                <li>Modern glassmorphism design</li>
+                <li>Responsive animations</li>
+                <li>Contact form with backend</li>
+                <li>SEO optimized</li>
+                <li>Lightning fast load times</li>
+            </ul>
+            <div class="project-mockup web-mockup">
+                <div class="mockup-content">
+                    <div class="techcorp-demo">
+                        <div class="scrolling-content">
+                            <div class="scroll-section hero-demo">
+                                <h4>Next-Gen SaaS</h4>
+                                <p>Unlock your team's potential.</p>
+                            </div>
+                            <div class="scroll-section feature-demo">
+                                <h4>Feature One</h4>
+                                <p>Lorem ipsum dolor sit amet...</p>
+                            </div>
+                            <div class="scroll-section feature-demo">
+                                <h4>Feature Two</h4>
+                                <p>Consectetur adipiscing elit...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-card">
+            <div class="project-header">
+                <h3 class="project-title">CryptoTracker – Portfolio Website</h3>
+                <span class="project-duration">4 days</span>
+            </div>
+            <ul class="project-features">
+                <li>Live crypto price updates</li>
+                <li>Interactive charts & graphs</li>
+                <li>Dark mode design</li>
+                <li>REST API integration</li>
+                <li>Fully responsive layout</li>
+            </ul>
+            <div class="project-mockup web-mockup">
+                <div class="mockup-content">
+                    <div class="crypto-demo">
+                        <div class="chart-bar"><div class="chart-bar-inner" style="height: 60%; animation-delay: 0s;"></div></div>
+                        <div class="chart-bar"><div class="chart-bar-inner" style="height: 80%; animation-delay: 0.1s; background: #a78bfa;"></div></div>
+                        <div class="chart-bar"><div class="chart-bar-inner" style="height: 50%; animation-delay: 0.2s;"></div></div>
+                        <div class="chart-bar"><div class="chart-bar-inner" style="height: 70%; animation-delay: 0.3s; background: #a78bfa;"></div></div>
+                        <div class="chart-bar"><div class="chart-bar-inner" style="height: 90%; animation-delay: 0.4s;"></div></div>
+                        <div class="chart-bar"><div class="chart-bar-inner" style="height: 60%; animation-delay: 0.5s; background: #a78bfa;"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="process" class="fade-in">
+        <h2 class="section-title">THE PROCESS</h2>
+        <div class="process-grid">
+            <div class="process-step">
+                <div class="process-number">1</div>
+                <h3>Requirement Mapping</h3>
+                <p>Understanding your vision and goals</p>
+            </div>
+            <div class="process-step">
+                <div class="process-number">2</div>
+                <h3>Design & Prototype</h3>
+                <p>Wireframing & creating pixel-perfect mockups</p>
+            </div>
+            <div class="process-step">
+                <div class="process-number">3</div>
+                <h3>Develop & Iterate</h3>
+                <p>Building with clean, scalable code</p>
+            </div>
+            <div class="process-step">
+                <div class="process-number">4</div>
+                <h3>Test & Deploy</h3>
+                <p>Ensuring performance and launching</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="fade-in">
+        <div class="confidence">
+            <div class="confidence-text">
+                I build digital experiences that are not only beautiful,
+                but are fast, functional, and built to last.
+            </div>
+        </div>
+    </section>
+
+    <section class="cta" id="contact">
+        <h2 class="fade-in">Have a project in mind?</h2>
+        <a href="mailto:divyambkp06@gmail.com" class="cta-button fade-in">
+            <span>Let's Talk</span>
+        </a>
+    </section>
+
+    <footer class="footer">
+        <div class="social-links">
+            <a href="#" target="_blank"><i data-lucide="github"></i></a>
+            <a href="#" target="_blank"><i data-lucide="linkedin"></i></a>
+            <a href="#" target="_blank"><i data-lucide="twitter"></i></a>
+        </div>
+        <p>© 2024 <a href="#home">Dev.Name</a>. All rights reserved.</p>
+    </footer>
+
+    <a href="#home" class="scroll-to-top" id="scrollToTop">
+        <i data-lucide="arrow-up"></i>
+    </a>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- 1. ICON REPLACEMENT ---
+            lucide.createIcons();
+
+            // --- 2. CUSTOM CURSOR ---
+            const cursor = document.querySelector('.cursor');
+            const follower = document.querySelector('.cursor-follower');
+            
+            document.addEventListener('mousemove', e => {
+                window.requestAnimationFrame(() => {
+                    if (cursor && follower) {
+                        cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+                        follower.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+                    }
+                });
+            });
+
+            // --- 3. CURSOR HOVER EFFECTS ---
+            const hoverElements = document.querySelectorAll(
+                'a, button, .showcase-card, .stack-item, .project-card, .process-step, .cta-button, .about-card, .scroll-to-top'
+            );
+            
+            hoverElements.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursor.classList.add('cursor-hover-grow');
+                    follower.classList.add('follower-hover-shrink');
+                });
+                el.addEventListener('mouseleave', () => {
+                    cursor.classList.remove('cursor-hover-grow');
+                    follower.classList.remove('follower-hover-shrink');
+                });
+            });
+
+            // --- 4. PARTICLE GENERATOR ---
+            const particlesContainer = document.getElementById('particles');
+            if (particlesContainer) {
+                const particleCount = 50;
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    particle.style.left = `${Math.random() * 100}vw`;
+                    particle.style.animationDelay = `${Math.random() * 15}s`;
+                    particlesContainer.appendChild(particle);
+                }
+            }
+
+            // --- 5. FADE-IN ON SCROLL ---
+            const fadeInElements = document.querySelectorAll('.fade-in');
+            
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            fadeInElements.forEach(el => {
+                observer.observe(el);
+            });
+            
+            // --- 6. INTERACTIVE SPOTLIGHT CARDS ---
+            document.querySelectorAll('.showcase-card, .stack-item, .project-card').forEach(card => {
+                card.addEventListener('mousemove', e => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    card.style.setProperty('--mouse-x', `${x}px`);
+                    card.style.setProperty('--mouse-y', `${y}px`);
+                });
+            });
+
+            // --- 7. NEW: NAVIGATION BAR HIDE/SHOW ---
+            const header = document.getElementById('header');
+            let lastScrollY = window.scrollY;
+
+            window.addEventListener('scroll', () => {
+                if (lastScrollY < window.scrollY) {
+                    // Scrolling Down
+                    header.classList.add('nav-hidden');
+                } else {
+                    // Scrolling Up
+                    header.classList.remove('nav-hidden');
+                }
+                lastScrollY = window.scrollY;
+            });
+            
+            // --- 8. NEW: SCROLL-TO-TOP BUTTON ---
+            const scrollToTopBtn = document.getElementById('scrollToTop');
+            
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    scrollToTopBtn.classList.add('visible');
+                } else {
+                    scrollToTopBtn.classList.remove('visible');
+                }
+            });
+
+        });
+    </script>
+
+</body>
+</html>
